@@ -8,13 +8,15 @@
 using namespace std;
 
 vector<vector<char*>> simple_shell::parse_command(char* cmd) {
-    vector<vector<char*>> commands;
-    stringstream ss(cmd);
+    vector<vector<char*>> commands; // making a double vector to split our commands and storing them
+    stringstream ss(cmd); 
     string command;
-    while (getline(ss, command, '|')) {
+    // splitting the commands based on |, meaning the differents commands that will write in the pipeline
+    while (getline(ss, command, '|')) { 
         vector<char*> args;
         stringstream ss_command(command);
         string arg;
+        // here, the commands will be split based on spaces. 
         while (ss_command >> arg) {
             char* cstr = new char[arg.length() + 1];
             strcpy(cstr, arg.c_str());
@@ -29,26 +31,28 @@ void simple_shell::exec_command(vector<vector<char*>> commands) {
     int fd[2]; // file descriptors for the pipe
     int prev_fd = -1; // file descriptor of previous command's output
     for (int i = 0; i < commands.size(); i++) {
+        // Here, the inner vector of the 2D vector is being converted into an array, so that we can execute those commands.  
         char** argv = new char*[commands[i].size()];
         for (int j = 0; j < commands[i].size(); j++) {
             argv[j] = new char[strlen(commands[i][j]) + 1];
             strcpy(argv[j], commands[i][j]);
-            isQuit(argv[j]);
+            isQuit(argv[j]); // if the commmand is quit, the shell quits. 
         }
         argv[commands[i].size()] = NULL; // null terminate the argument list
         if (strcmp(argv[0], "cd") == 0) {
             cd_command(argv);
             continue; // skip the fork/exec process for cd command
         }
+        // creating a communication link, unless we are on the last command. 
         if (i != commands.size() - 1) {
             pipe(fd); // create a pipe for communication between the processes
         }
-
         int pid = fork(); // forking the parent to get the child process
+        
         if( pid < 0){ 
             cout << "Fork failed to execute" << endl;
             exit(1);
-        }else if (pid == 0) {
+        } else if (pid == 0) {
             // child process
             if (prev_fd != -1) {
                 close(STDIN_FILENO); // close standard input
@@ -89,6 +93,7 @@ void simple_shell::exec_command(vector<vector<char*>> commands) {
     }
 }
 
+// function to define what the CD function does. 
 void simple_shell::cd_command(char** argv) {
     if (argv[1] == NULL) {
         cout << "cd: No directory specified" << endl;
