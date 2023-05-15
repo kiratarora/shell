@@ -15,6 +15,7 @@ class simple_shell {
   std::vector<std::vector<char*>> parse_command(char* cmd);
   void exec_command(std::vector<std::vector<char*>> commands);
   bool isQuit(char* cmd);
+  void handle_alias(char** argv);
   void cd_command(char** argv);
 };
 

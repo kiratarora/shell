@@ -3,9 +3,13 @@
 #include <sstream>
 #include <cstring>
 #include <vector>
+#include <map>
 #include <unistd.h>
+#include <typeinfo>
 
 using namespace std;
+
+map<string, string> aliases;
 
 vector<vector<char*>> simple_shell::parse_command(char* cmd) {
     vector<vector<char*>> commands; // making a double vector to split our commands and storing them
@@ -43,6 +47,10 @@ void simple_shell::exec_command(vector<vector<char*>> commands) {
             cd_command(argv);
             continue; // skip the fork/exec process for cd command
         }
+        if (strcmp(argv[0], "alias") == 0) {
+            handle_alias(argv);
+            continue; // skip the fork/exec process for cd command
+        }
         // creating a communication link, unless we are on the last command. 
         if (i != commands.size() - 1) {
             pipe(fd); // create a pipe for communication between the processes
@@ -63,6 +71,35 @@ void simple_shell::exec_command(vector<vector<char*>> commands) {
                 close(STDOUT_FILENO); // close standard output
                 dup2(fd[1], STDOUT_FILENO); // redirect output to the next command's input
                 close(fd[0]); // close the read end of the pipe
+            }
+            // auto iter = aliases.find(argv[0]);
+            const string aliasName = argv[0];
+            if (aliases.count(aliasName) > 0) {
+                // aliases[aliasName];
+                char cmd[81];
+                strcpy(cmd, aliases[aliasName].c_str());
+                char *cmdTokens[25];
+                char delimiter = ' ';
+                stringstream ss(cmd);
+                string token;
+                int i = 0;
+                while (getline(ss, token, delimiter)) { 
+                    // splitting on each word
+                    if (!token.empty()) {
+                        // removing the \n character from the token
+                        if (token.back() == '\n'){
+                            token.pop_back();
+                        } 
+                        // adding a new char* token to the token list
+                        cmdTokens[i] = new char[token.length() + 1]; 
+                        // converting the string token to char* and storing it in the token list
+                        strcpy(cmdTokens[i], token.c_str());  
+                        i++;
+                    }
+                }
+                cmdTokens[i] = NULL; 
+                execvp(cmdTokens[0], cmdTokens);
+
             }
             if (strcmp(argv[0], "echo") == 0) {
                 // handle the "echo" command
@@ -101,6 +138,35 @@ void simple_shell::cd_command(char** argv) {
         if (chdir(argv[1]) != 0) {
             perror("cd");
         }
+    }
+}
+
+// function to handle alias
+void simple_shell::handle_alias(char** argv) {
+    if (argv[1] == NULL) {
+        // No arguments provided, display the list of defined aliases
+        for (const auto& alias : aliases) {
+            cout << alias.first << "='" << alias.second << "'" << endl;
+        }
+    } else if (argv[2] == NULL) {
+        // Display the value of a specific alias
+        const string aliasName = argv[1];
+        if (aliases.count(aliasName) > 0) {
+            cout << aliasName << "='" << aliases[aliasName] << "'" << endl;
+        } else {
+            cout << "Alias '" << aliasName << "' not found" << endl;
+        }
+    } else {
+        // Create or update an alias
+        const string aliasName = argv[1];
+        int i = 3;
+        string aliasValue = "";
+        while(argv[i] != NULL){
+            aliasValue = aliasValue + argv[i] + " ";
+            ++i;
+        }
+        aliasValue = aliasValue.substr(0, aliasValue.length() - 1);
+        aliases[aliasName] = aliasValue;
     }
 }
 
