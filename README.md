@@ -2,7 +2,7 @@
 
 This is the final project for Computer Science 377. 
 
-Here, I have implemented a shell script that apart from running regular shell commands such as ```ls``` and ```quit```, can also run pipelining commands and certain Bash Builtin Commands such as ```cd```, ``` echo```, and ```pwd```.
+Here, I have implemented a shell script that apart from running regular shell commands such as ```ls``` and ```quit```, can also run pipelining commands and certain Bash Builtin Commands such as ```cd```, ``` echo```, ```alias```, and ```pwd```.
 
 Here is a brief description of the project, along with a video to demonstarate the functionality:
 
@@ -33,4 +33,4 @@ if (i != commands.size() - 1) {
 This part of the code shows how the output from the previous command is redirected to the pipe, and then that output is redirected to the next command's input. 
 
 
-To implement the ```pwd``` command, I simply get the cwd and print that. Similarly for the ```cd``` command, I check if the path exists, and then change the directory to that folder. 
+To implement the ```pwd``` command, I simply get the cwd and print that. Similarly for the ```cd``` command, I check if the path exists, and then change the directory to that folder. Similarly, to implement the ```alias``` command, I created a map to maintain links from the aliasis to the commands that need to be executed. 
