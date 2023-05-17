@@ -6,7 +6,7 @@ Here, I have implemented a shell script that apart from running regular shell co
 
 Here is a brief description of the project, along with a video to demonstarate the functionality:
 
-To implement pipelining commands, the code simply creates a pipe that a command can write to so that the next command can read from it as an input for itself. 
+To implement pipelining commands, the code simply creates a pipe that a command can write to, and the next command can read from as an input for itself. 
 
 ```
 if (i != commands.size() - 1) {
@@ -14,7 +14,7 @@ if (i != commands.size() - 1) {
 }
 ```
 
-The above line of code simply creates a pipe for the commands to use to exchange outputs. 
+The above line of code creates a pipe for the commands to use to exchange outputs. 
 
 ```
 if (prev_fd != -1) {
@@ -34,3 +34,6 @@ This part of the code shows how the output from the previous command is redirect
 
 
 To implement the ```pwd``` command, I simply get the cwd and print that. Similarly for the ```cd``` command, I check if the path exists, and then change the directory to that folder. Similarly, to implement the ```alias``` command, I created a map to maintain links from the aliasis to the commands that need to be executed. 
+
+[Here](https://drive.google.com/file/d/1q2eYNQ8Us21P_T4Bip-ZO8PJZ9vo2V5n/view) is a link to the video with the presentation. And Here is the presentation:
+[link](/presentation/presentataion.pdf)

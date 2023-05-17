@@ -9,6 +9,7 @@
 
 using namespace std;
 
+// map that hold the alias commands
 map<string, string> aliases;
 
 vector<vector<char*>> simple_shell::parse_command(char* cmd) {
@@ -72,7 +73,7 @@ void simple_shell::exec_command(vector<vector<char*>> commands) {
                 dup2(fd[1], STDOUT_FILENO); // redirect output to the next command's input
                 close(fd[0]); // close the read end of the pipe
             }
-            // auto iter = aliases.find(argv[0]);
+    
             const string aliasName = argv[0];
             if (aliases.count(aliasName) > 0) {
                 // aliases[aliasName];
